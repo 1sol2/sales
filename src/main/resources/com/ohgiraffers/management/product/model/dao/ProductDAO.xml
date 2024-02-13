@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ohgiraffers.management.product.model.dao.ProductDAO">
+
+    <resultMap type="ProductDTO" id="productResultMap">
+        <id property="productCode" column="PRODUCT_CODE"/>
+        <result property="productName" column="PRODUCT_NAME"/>
+        <result property="productPrice" column="PRODUCT_PRICE"/>
+
+    </resultMap>
+
+    <select id="selectAllProductList" resultMap="productResultMap">
+        SELECT  PRODUCT_CODE
+             ,PRODUCT_NAME
+             ,PRODUCT_PRICE
+        FROM  TBL_PRODUCT
+        ORDER BY PRODUCT_CODE
+    </select>
+
+    <select id="selectProductByCondition" parameterType="SearchCondition" resultMap="productResultMap">
+        SELECT  PRODUCT_CODE
+        ,PRODUCT_NAME
+        ,PRODUCT_PRICE
+        FROM  TBL_PRODUCT
+        <where>
+            <choose>
+                <when test="option != null and option eq 'productName'">
+                    PRODUCT_NAME LIKE CONCAT('%', #{ value }, '%')
+                </when>
+            </choose>
+        </where>
+        ORDER BY PRODUCT_CODE
+    </select>
+
+    <insert id="insertProduct" parameterType="ProductDTO">
+        INSERT INTO TBL_PRODUCT (PRODUCT_NAME, PRODUCT_PRICE)
+        VALUES( #{productName}, #{productPrice} )
+    </insert>
+
+    <update id="updateProduct" parameterType="ProductDTO">
+        UPDATE TBL_PRODUCT
+        <set>
+            <if test="productName != null">
+                PRODUCT_NAME = #{productName}
+            </if>
+            <if test="productPrice > 0">
+                ,PRODUCT_PRICE = #{productPrice}
+            </if>
+        </set>
+        WHERE PRODUCT_CODE = #{productCode}
+    </update>
+
+    <delete id="deleteProduct" parameterType="hashMap">
+        DELETE
+        FROM TBL_PRODUCT
+        WHERE PRODUCT_CODE = #{productCode}
+    </delete>
+
+
+</mapper>
